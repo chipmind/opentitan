@@ -37,16 +37,26 @@ module aon_timer_core import aon_timer_reg_pkg::*; (
   // Wakeup Timer //
   //////////////////
 
+  // Store previous prescaler value to detect changes
+  logic [11:0] prescaler_q;
+
   // Prescaler counter
-  assign prescale_count_d = wkup_incr ? 12'h000 : (prescale_count_q + 12'h001);
+  // Reset counter when prescaler value changes or when counter reaches the threshold
+  assign prescale_count_d = wkup_incr || (prescaler_q != reg2hw_i.wkup_ctrl.prescaler.q) ? 
+                            12'h000 : (prescale_count_q + 12'h001);
   assign prescale_en      = reg2hw_i.wkup_ctrl.enable.q &
                             lc_ctrl_pkg::lc_tx_test_false_strict(lc_escalate_en_i[0]);
 
   always_ff @(posedge clk_aon_i or negedge rst_aon_ni) begin
     if (!rst_aon_ni) begin
       prescale_count_q <= 12'h000;
-    end else if (prescale_en) begin
-      prescale_count_q <= prescale_count_d;
+      prescaler_q <= 12'h000;
+    end else begin
+      if (prescale_en) begin
+        prescale_count_q <= prescale_count_d;
+      end
+      // Always update the stored prescaler value to detect changes
+      prescaler_q <= reg2hw_i.wkup_ctrl.prescaler.q;
     end
   end
 
