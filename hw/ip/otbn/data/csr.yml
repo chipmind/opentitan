@@ -205,3 +205,10 @@
   bits:
     7-0: ERROR_CODE contains the error code coming directly from the KMAC HWIP.
     31-8: Reserved. Always reads as 0. Any write is ignored.
+    
+- name: insn_cnt
+  address: 0xfe1
+  read-only: true
+  doc: |
+    Instruction count since the start of the current operation.
+    This 32-bit counter increments for each executed instruction and resets to zero when OTBN starts a new operation.

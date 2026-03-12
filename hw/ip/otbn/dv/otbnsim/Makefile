@@ -29,3 +29,7 @@ lint: $(lint-stamps)
 .PHONY: test
 test:
 	pytest test
+
+.PHONY: special-test
+special-test:
+	pytest test/special_test.py --basetemp=./test_tmp -v

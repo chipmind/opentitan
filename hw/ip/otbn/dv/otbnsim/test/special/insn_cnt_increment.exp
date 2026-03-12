@@ -1,0 +1,9 @@
+# Copyright 2026 Chipmind AG.
+# Solderpad Hardware License, Version 0.51, see LICENSE for details.
+# SPDX-License-Identifier: SHL-0.51
+
+x2 = 0x00000002
+x3 = 0x00000003
+x4 = 0x00000004
+x5 = 0x00000001
+x6 = 0x00000004

@@ -82,6 +82,7 @@ interface otbn_trace_if
   input logic                      rnd_valid,
 
   input logic [otbn_pkg::WLEN-1:0] urnd_data,
+  input logic [31:0]               insn_cnt,
 
   input logic [1:0][otbn_pkg::SideloadKeyWidth-1:0] sideload_key_shares_i,
 
@@ -297,6 +298,8 @@ interface otbn_trace_if
   assign ispr_write_data[IsprKeyS1L] = '0;
   assign ispr_write[IsprKeyS1H] = 1'b0;
   assign ispr_write_data[IsprKeyS1H] = '0;
+  assign ispr_write[IsprInsnCnt] = 1'b0;
+  assign ispr_write_data[IsprInsnCnt] = '0;
 
   assign ispr_read[IsprKeyS0L] = any_ispr_read & (ispr_addr == IsprKeyS0L);
   assign ispr_read_data[IsprKeyS0L] = sideload_key_shares_i[0][255:0];
@@ -311,6 +314,9 @@ interface otbn_trace_if
   assign ispr_read[IsprKeyS1H] = any_ispr_read & (ispr_addr == IsprKeyS1H);
   assign ispr_read_data[IsprKeyS1H] = {{(WLEN - (SideloadKeyWidth - 256)){1'b0}},
                                        sideload_key_shares_i[1][SideloadKeyWidth-1:256]};
+
+  assign ispr_read[IsprInsnCnt] = any_ispr_read & (ispr_addr == IsprInsnCnt);
+  assign ispr_read_data[IsprInsnCnt] = {{(WLEN - 32){1'b0}}, insn_cnt};
 
   // Separate per flag group tracking using the flags_t struct so tracer can cleanly present flag
   // accesses.

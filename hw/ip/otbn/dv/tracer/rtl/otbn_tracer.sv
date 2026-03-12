@@ -90,8 +90,34 @@ module otbn_tracer (
       IsprRnd: return "RND";
       IsprFlags: return "FLAGS";
       IsprUrnd: return "URND";
+      IsprInsnCnt: return "INSN_CNT";
       default: return "UNKNOWN_ISPR";
     endcase
+  endfunction
+
+  // Return the size in bits for any ISPR
+  function automatic int otbn_ispr_size(ispr_e ispr);
+    unique case (ispr)
+      IsprMod, IsprAcc, IsprUrnd, IsprRnd: return WLEN;
+      IsprFlags, IsprInsnCnt: return 32;
+      default: return -1;
+    endcase
+  endfunction
+
+  // Combine ISPR name and formatted data in a single string
+  function automatic string otbn_ispr_access_str(ispr_e ispr, logic [WLEN-1:0] data);
+    int size = otbn_ispr_size(ispr);
+    string formatted_data;
+    
+    if (size == WLEN) begin
+      formatted_data = otbn_wlen_data_str(data);
+    end else if (size == 32) begin
+      formatted_data = $sformatf("0x%08x", data[31:0]);
+    end else begin
+      formatted_data = "UNKNOWN_SIZE";
+    end
+    
+    return $sformatf("%s: %s", otbn_ispr_name_str(ispr), formatted_data);
   endfunction
 
   // Format flag information into a string
@@ -193,14 +219,12 @@ module otbn_tracer (
         // For all other ISPRs just dump out the full 256-bits of data being read/written
         if (otbn_trace.ispr_read[i_ispr]) begin
           work = output_trace(work, RegReadPrefix,
-                              $sformatf("%s: %s", otbn_ispr_name_str(ispr_e'(i_ispr)),
-                                        otbn_wlen_data_str(otbn_trace.ispr_read_data[i_ispr])));
+                              otbn_ispr_access_str(ispr_e'(i_ispr), otbn_trace.ispr_read_data[i_ispr]));
         end
 
         if (otbn_trace.ispr_write[i_ispr]) begin
           work = output_trace(work, RegWritePrefix,
-                              $sformatf("%s: %s", otbn_ispr_name_str(ispr_e'(i_ispr)),
-                                        otbn_wlen_data_str(otbn_trace.ispr_write_data[i_ispr])));
+                              otbn_ispr_access_str(ispr_e'(i_ispr), otbn_trace.ispr_write_data[i_ispr]));
         end
       end
     end

@@ -144,6 +144,7 @@ module otbn_alu_bignum
 
   input  logic [WLEN-1:0]             rnd_data_i,
   input  logic [WLEN-1:0]             urnd_data_i,
+  input  logic [31:0]                 insn_cnt_i,
 
   input  logic [1:0][SideloadKeyWidth-1:0] sideload_key_shares_i,
 
@@ -511,6 +512,7 @@ module otbn_alu_bignum
 
   assign ispr_rdata_no_intg_mux_in[IsprRnd]    = rnd_data_i;
   assign ispr_rdata_no_intg_mux_in[IsprUrnd]   = urnd_data_i;
+  assign ispr_rdata_no_intg_mux_in[IsprInsnCnt] = {{(WLEN - 32){1'b0}}, insn_cnt_i};
   assign ispr_rdata_no_intg_mux_in[IsprFlags]  = {{(WLEN - (NFlagGroups * FlagsWidth)){1'b0}},
                                                  flags_flattened};
   // SEC_CM: KEY.SIDELOAD
@@ -554,6 +556,7 @@ module otbn_alu_bignum
   assign ispr_rdata_intg_mux_sel[IsprNoIntg] =
     |{ispr_bignum_predec_i.ispr_rd_en[IsprKeyS1H:IsprKeyS0L],
       ispr_bignum_predec_i.ispr_rd_en[IsprUrnd],
+      ispr_bignum_predec_i.ispr_rd_en[IsprInsnCnt],
       ispr_bignum_predec_i.ispr_rd_en[IsprFlags],
       ispr_bignum_predec_i.ispr_rd_en[IsprRnd]};
 

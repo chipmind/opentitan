@@ -716,6 +716,7 @@ module otbn_predecode
         CsrMod4, CsrMod5, CsrMod6, CsrMod7: ispr_addr = IsprMod;
         CsrRnd:                             ispr_addr = IsprRnd;
         CsrUrnd:                            ispr_addr = IsprUrnd;
+        CsrInsnCnt:                         ispr_addr = IsprInsnCnt;
         default: ;
       endcase
     end else begin

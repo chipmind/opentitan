@@ -374,7 +374,8 @@ package otbn_pkg;
 
     // 0xFC0-0xFFF Custom read-only
     CsrRnd         = 12'hFC0,
-    CsrUrnd        = 12'hFC1
+    CsrUrnd        = 12'hFC1,
+    CsrInsnCnt     = 12'hFE1
   } csr_e;
 
   // Wide Special Purpose Registers (WSRs)
@@ -394,7 +395,7 @@ package otbn_pkg;
   // Internal Special Purpose Registers (ISPRs)
   // CSRs and WSRs have some overlap into what they map into. ISPRs are the actual registers in the
   // design which CSRs and WSRs are mapped on to.
-  parameter int NIspr = 9;
+  parameter int NIspr = 10;
   parameter int IsprNumWidth = $clog2(NIspr);
   typedef enum logic [IsprNumWidth-1:0] {
     IsprMod    = 'd0,
@@ -405,7 +406,8 @@ package otbn_pkg;
     IsprKeyS0L = 'd5,
     IsprKeyS0H = 'd6,
     IsprKeyS1L = 'd7,
-    IsprKeyS1H = 'd8
+    IsprKeyS1H = 'd8,
+    IsprInsnCnt = 'd9
   } ispr_e;
 
   typedef logic [$clog2(NFlagGroups)-1:0] flag_group_t;

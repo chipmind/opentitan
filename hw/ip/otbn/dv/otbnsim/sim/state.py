@@ -83,7 +83,7 @@ class OTBNState:
 
         self.ext_regs = OTBNExtRegs()
         self.wsrs = WSRFile(self.ext_regs)
-        self.csrs = CSRFile(self.wsrs)
+        self.csrs = CSRFile(self.wsrs, self.ext_regs)
         self.kmac = Kmac(self.csrs, self.wsrs)
 
         self.pc = 0
@@ -382,6 +382,7 @@ class OTBNState:
         # treatment because some of them have values that persist across
         # operations.
         # TODO: Figure out when and how kmac should be reset.
+        self.csrs = CSRFile(self.wsrs, self.ext_regs)
         self.wsrs.on_start()
         self.csrs = CSRFile(self.wsrs)
         self.kmac.on_start(self.csrs, self.wsrs)
