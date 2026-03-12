@@ -15,6 +15,35 @@ from .kmac_ispr import (
 )
 from .trace import Trace
 from .wsr import WSRFile
+from .ext_regs import OTBNExtRegs
+
+
+class WrapperCSR:
+    """A CSR that delegates read/write logic to external callback functions.
+
+    Useful for registers that map to non-standard logic.
+    """
+
+    def __init__(self,
+                 read_func: Optional[Callable[[], int]] = None,
+                 write_func: Optional[Callable[[int], Any]] = None):
+
+        self._read_func = read_func if read_func else self._default_read
+        self._write_func = write_func if write_func else self._default_write
+
+    def _default_read(self) -> int:
+        """Default behavior: Return 0"""
+        return 0
+
+    def _default_write(self, value: int) -> None:
+        """Default behavior: Ineffective write"""
+        return
+
+    def read_unsigned(self) -> int:
+        return self._read_func()
+
+    def write_unsigned(self, value: int) -> None:
+        self._write_func(value)
 
 
 class WrapperCSR:
@@ -47,8 +76,10 @@ class WrapperCSR:
 
 class CSRFile:
     '''A model of the CSR file'''
-    def __init__(self, wsrs: WSRFile) -> None:
+    def __init__(self, wsrs: WSRFile, ext_regs: OTBNExtRegs) -> None:
         self.flags = FlagGroups()
+        self.wsrs = wsrs
+        self.ext_regs = ext_regs
         self.RND_PREFETCH = WrapperCSR(
             write_func=lambda val: wsrs.RND.request_value()
         )
@@ -60,6 +91,7 @@ class CSRFile:
         self.KMAC_MSG_SEND = KmacCommandCSR('KMAC_MSG_SEND', write_mask=0x1)
         self.RND = WrapperCSR(read_func=wsrs.RND.read_u32)
         self.URND = WrapperCSR(read_func=wsrs.URND.read_u32)
+        self.INSN_CNT = WrapperCSR(read_func=ext_regs.read_insn_cnt)
         self.KMAC_CMD = KmacCommandCSR('KMAC_CMD', write_mask=0x3f)
         self.KMAC_BYTE_STROBE = DumbISPR('KMAC_BYTE_STROBE', width=32)
 
@@ -79,6 +111,7 @@ class CSRFile:
             0xfc1,  # URND
             0xfc2,  # KMAC_STATUS
             0xfc3,  # KMAC_ERROR
+            0xfe1,  # INSN_CNT
         }
 
         self._idx_to_csr: Dict[int, Any] = {
@@ -94,6 +127,7 @@ class CSRFile:
             0xfc1: self.URND,
             0xfc2: self.KMAC_STATUS,
             0xfc3: self.KMAC_ERROR,
+            0xfe1: self.INSN_CNT,
         }
 
     @staticmethod
