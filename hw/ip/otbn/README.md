@@ -664,6 +664,15 @@ All read-write (RW) CSRs are set to 0 when OTBN starts an operation (when 1 is w
         </table>
       </td>
     </tr>
+    <tr>
+      <td>0xFE1</td>
+      <td>RO</td>
+      <td>INSN_CNT</td>
+      <td>
+        Instruction count since the start of the current operation.
+        This 32-bit counter increments for each executed instruction and resets to zero when OTBN starts a new operation.
+      </td>
+    </tr>
   </tbody>
 </table>
 

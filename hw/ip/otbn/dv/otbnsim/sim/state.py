@@ -382,9 +382,9 @@ class OTBNState:
         # treatment because some of them have values that persist across
         # operations.
         # TODO: Figure out when and how kmac should be reset.
-        self.csrs = CSRFile(self.wsrs, self.ext_regs)
         self.wsrs.on_start()
-        self.csrs = CSRFile(self.wsrs)
+        self.ext_regs.write('INSN_CNT', 0, True, immediately=True)
+        self.csrs = CSRFile(self.wsrs, self.ext_regs)
         self.kmac.on_start(self.csrs, self.wsrs)
         self.loop_stack = LoopStack()
         self.gprs.empty_call_stack()

@@ -46,34 +46,6 @@ class WrapperCSR:
         self._write_func(value)
 
 
-class WrapperCSR:
-    """A CSR that delegates read/write logic to external callback functions.
-
-    Useful for registers that map to non-standard logic.
-    """
-
-    def __init__(self,
-                 read_func: Optional[Callable[[], int]] = None,
-                 write_func: Optional[Callable[[int], Any]] = None):
-
-        self._read_func = read_func if read_func else self._default_read
-        self._write_func = write_func if write_func else self._default_write
-
-    def _default_read(self) -> int:
-        """Default behavior: Return 0"""
-        return 0
-
-    def _default_write(self, value: int) -> None:
-        """Default behavior: Ineffective write"""
-        return
-
-    def read_unsigned(self) -> int:
-        return self._read_func()
-
-    def write_unsigned(self, value: int) -> None:
-        self._write_func(value)
-
-
 class CSRFile:
     '''A model of the CSR file'''
     def __init__(self, wsrs: WSRFile, ext_regs: OTBNExtRegs) -> None:

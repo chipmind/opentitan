@@ -285,6 +285,10 @@ class OTBNExtRegs:
         # of internal state before it gets zeroed out.
         self.regs['WIPE_START'] = make_flag_reg('WIPE_START', False)
 
+        # Add a fake "INSN_CNT" register to track the instruction count.
+        # This is a read-only register that increments on each instruction.
+        self.regs['INSN_CNT'] = make_flag_reg('INSN_CNT', False)
+
     def _get_reg(self, reg_name: str) -> RGReg:
         reg = self.regs.get(reg_name)
         if reg is None:
